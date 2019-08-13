@@ -3,6 +3,8 @@ package it.mathiasmah.junik.client;
 import it.mathiasmah.junik.client.exceptions.UnikException;
 import it.mathiasmah.junik.client.models.CreateVolume;
 import it.mathiasmah.junik.client.models.Volume;
+import jdk.internal.joptsimple.internal.Strings;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -23,6 +25,7 @@ import java.util.*;
 public class Volumes extends Requests {
 
     private static final String VOLUMES_BASE = "/volumes";
+    private static final String TYPE_EXT2 = "ext2";
 
     Volumes(HttpClient client, String baseUrl) throws UnikException {
         super(client, baseUrl);
@@ -86,6 +89,11 @@ public class Volumes extends Requests {
      * @see Volume
      */
     public Volume create(final CreateVolume createVolume) throws UnikException {
+
+        if(Strings.isNullOrEmpty(createVolume.getTarFile())){
+            createVolume.setType(TYPE_EXT2);
+        }
+
         if (createVolume.getTarFile() != null) {
             return createFormData(createVolume);
         }
