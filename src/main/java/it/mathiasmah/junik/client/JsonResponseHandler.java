@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.AbstractResponseHandler;
@@ -20,11 +21,10 @@ class JsonResponseHandler<T> extends AbstractResponseHandler<T> {
 
     JsonResponseHandler(Class<T> type) {
         objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.findAndRegisterModules();
-
         this.type = type;
     }
 
