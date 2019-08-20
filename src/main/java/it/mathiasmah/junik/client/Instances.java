@@ -5,8 +5,8 @@ import it.mathiasmah.junik.client.models.Instance;
 import it.mathiasmah.junik.client.models.RunInstance;
 import org.apache.http.client.HttpClient;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +39,7 @@ public class Instances extends Requests {
     /**
      * Describe an instance identified by its ID or name.
      * <p/>
-     *Includes important information about the state of the instance.
+     * Includes important information about the state of the instance.
      *
      * @param name the name or the id of an existing instance
      * @return a {@link Instance} holding the information about the instance
@@ -95,7 +95,7 @@ public class Instances extends Requests {
     /**
      * Deletes an instance identified by its ID or name.
      *
-     * @param name the name or ID of an existing instance
+     * @param name  the name or ID of an existing instance
      * @param force the removal of the instance will be enforced
      * @throws UnikException if the request was not successful
      */
@@ -118,22 +118,63 @@ public class Instances extends Requests {
     }
 
     /**
-     * Retrieves logs form a running unikernel instance as a stream.
+     * Write logs form a running unikernel instance to a stream.
      * <p/>
      * The connection will stay open and all new logs will be delivered until the stream is closed by the client or the instance is terminated.
      *
-     * @param name the name or ID of a running instance
+     * @param name                the name or ID of a running instance
      * @param deleteOnTermination specify if the instance should be removed as soon as the stream is closed.
-     * @return an {@link InputStream} delivering all logs
+     * @param outputStream        the stream the log messages are written to
      * @throws UnikException if the request was not successful
      * @see InputStream
      */
-    public InputStream logsAsStream(final String name, final boolean deleteOnTermination) throws UnikException {
+    public void logToStream(final String name, final boolean deleteOnTermination, final OutputStream outputStream) throws UnikException {
 
         Map<String, String> params = new HashMap<>();
         params.put("follow", String.valueOf(true));
         params.put("delete", String.valueOf(deleteOnTermination));
 
-        return get(String.format(INSTANCES_BASE + "/%s/logs", name), params, InputStream.class);
+        String line;
+        HttpURLConnection httpConn = null;
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(outputStream));
+        try {
+            URL url = buildURI(String.format("/instances/%s/logs", name), params).toURL();
+            httpConn = (HttpURLConnection) url.openConnection();
+
+            httpConn.setAllowUserInteraction(false);
+            httpConn.setInstanceFollowRedirects(true);
+            httpConn.setRequestMethod("GET");
+            httpConn.setReadTimeout(50 * 1000);
+
+            BufferedReader is = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
+
+            while ((line = is.readLine()) != null) {
+
+                out.write(line);
+                out.newLine();
+                out.flush();
+
+            }
+        } catch (MalformedURLException | SocketTimeoutException | URISyntaxException e) {
+            throw new UnikException("Could not connnect", e);
+        } catch (IOException e) {
+            if (httpConn != null) {
+
+                BufferedReader is = new BufferedReader(new InputStreamReader(httpConn.getErrorStream()));
+
+                try {
+                    while ((line = is.readLine()) != null) {
+                        out.write(line);
+                        out.flush();
+                    }
+                } catch (IOException ignore) {
+                }
+            }
+
+        } finally {
+            if (httpConn != null) {
+                httpConn.disconnect();
+            }
+        }
     }
 }

@@ -75,7 +75,7 @@ public class InstancesTest {
 
     @Test
     public void logsAsStream() throws UnikException {
-        InputStream inputStream = client.instances().logsAsStream("VboxUnikInstanceListener", true);
+        InputStream inputStream = client.instances().logToStream("VboxUnikInstanceListener", true);
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
             String line = br.readLine();

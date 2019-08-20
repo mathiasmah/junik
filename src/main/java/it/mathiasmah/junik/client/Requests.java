@@ -108,20 +108,18 @@ abstract class Requests {
                 return null;
             } else if (String.class.equals(returnType)) {
                 return (T) client.execute(request, new StringResponseHandler());
-            } else if (InputStream.class.equals(returnType)) {
-                return (T) client.execute(request, new StreamResponseHandler());
             } else {
                 return client.execute(request, new JsonResponseHandler<>(returnType));
             }
 
         } catch (HttpResponseException e) {
-            throw new UnikException("Request was not successful, status code [" + e.getStatusCode() + "], error response [" + e.getReasonPhrase() + "]");
+            throw new UnikException("Request was not successful, status code [" + e.getStatusCode() + "], error response [" + e.getMessage() + "]");
         } catch (IOException e) {
             throw new UnikException(e);
         }
     }
 
-    private URI buildURI(String url, final Map<String, String> queries) throws URISyntaxException {
+    URI buildURI(String url, final Map<String, String> queries) throws URISyntaxException {
         URIBuilder builder = new URIBuilder()
                 .setScheme(schema)
                 .setHost(host)
