@@ -3,13 +3,14 @@ package it.mathiasmah.junik.client;
 import it.mathiasmah.junik.client.exceptions.UnikException;
 import it.mathiasmah.junik.client.models.Hub;
 import org.apache.http.client.HttpClient;
+import org.apache.http.util.Asserts;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  A class holding all requests related to unik hubs
+ * A class holding all requests related to unik hubs
  */
 public class Hubs extends Requests {
 
@@ -22,12 +23,14 @@ public class Hubs extends Requests {
     /**
      * Pushes an image from the unik target to the specified unik hub
      *
-     * @param hub a {@link Hub} containing the information about the unik hub
-     * @param imageName the name of an image
+     * @param hub       a {@link Hub} containing the information about the unik hub
+     * @param imageName the name of an image, cannot be blank
      * @throws UnikException if the request was not successful
      * @see Hub
      */
     public void push(Hub hub, String imageName) throws UnikException {
+        Asserts.notBlank("image name", imageName);
+
         JsonBodyBuilder builder = new JsonBodyBuilder().addObject(hub);
 
         try {
@@ -41,14 +44,17 @@ public class Hubs extends Requests {
     /**
      * Pulls an image from a specified unik hub to the unik target
      *
-     * @param hub a {@link Hub} containing the information about the unik hub
-     * @param imageName the name of an image
-     * @param provider the name of a provider
-     * @param force the pulling of the image will be enforced, e.g. an existing image will be overwritten
+     * @param hub       a {@link Hub} containing the information about the unik hub
+     * @param imageName the name of an image, cannot be blank
+     * @param provider  the name of a provider, cannot be blank
+     * @param force     the pulling of the image will be enforced, e.g. an existing image will be overwritten
      * @throws UnikException if the request was not successful
      * @see Hub
      */
     public void pull(Hub hub, String imageName, String provider, boolean force) throws UnikException {
+        Asserts.notBlank("image name", imageName);
+        Asserts.notBlank("provider", provider);
+
         JsonBodyBuilder builder = new JsonBodyBuilder().addObject(hub);
 
         Map<String, String> params = new HashMap<>();
@@ -56,7 +62,7 @@ public class Hubs extends Requests {
         params.put("force", String.valueOf(force));
 
         try {
-            post(String.format(IMAGES_BASE + "pull/%s", imageName),params, builder.build());
+            post(String.format(IMAGES_BASE + "pull/%s", imageName), params, builder.build());
         } catch (IOException e) {
             throw new UnikException(e);
         }
@@ -66,12 +72,14 @@ public class Hubs extends Requests {
     /**
      * Remove an image from the specified unik hub.
      *
-     * @param hub a {@link Hub} containing the information about the unik hub
-     * @param imageName the name of an image
+     * @param hub       a {@link Hub} containing the information about the unik hub
+     * @param imageName the name of an image, cannot be blank
      * @throws UnikException if the request was not successful
      * @see Hub
      */
     public void remove(Hub hub, String imageName) throws UnikException {
+        Asserts.notBlank("image name", imageName);
+
         JsonBodyBuilder builder = new JsonBodyBuilder().addObject(hub);
 
         try {
@@ -79,5 +87,10 @@ public class Hubs extends Requests {
         } catch (IOException e) {
             throw new UnikException(e);
         }
+    }
+
+    private void validateHub(Hub hub) {
+        Asserts.notNull(hub, "Hub definition");
+        Asserts.notBlank(hub.getUrl(), "Hub URL");
     }
 }

@@ -3,7 +3,8 @@ package it.mathiasmah.junik.client;
 import org.apache.http.HttpEntity;
 import org.apache.http.impl.client.AbstractResponseHandler;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 
 class StreamResponseHandler extends AbstractResponseHandler<Void> {
 
@@ -15,7 +16,7 @@ class StreamResponseHandler extends AbstractResponseHandler<Void> {
 
     @Override
     public Void handleEntity(HttpEntity entity) throws IOException {
-        if(entity != null) {
+        if (entity != null) {
             entity.writeTo(outputStream);
         }
         return null;

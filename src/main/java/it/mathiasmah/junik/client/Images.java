@@ -8,6 +8,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.util.Asserts;
 
 import java.io.File;
 import java.util.Arrays;
@@ -42,17 +43,18 @@ public class Images extends Requests {
 
     /**
      * Get the information about one image, identified by its name.
-     *  <p/>
+     * <p/>
      * Includes important information for running and managing an instance of the image,
      * for example the required mount points for the image.
      *
-     *
      * @param name the name of an image
-     * @return a {@link Image} describing the requested image
+     * @return a {@link Image} describing the requested image, cannot be blank
      * @throws UnikException if the request was not successful
      * @see Image
      */
     public Image describe(final String name) throws UnikException {
+        Asserts.notBlank(name, "Image name");
+
         return get(String.format(IMAGES_BASE + "/%s", name), Image.class);
     }
 
@@ -66,6 +68,7 @@ public class Images extends Requests {
      * @see Image
      */
     public Image create(final CreateImage image) throws UnikException {
+        validateCreateImage(image);
 
         MultipartEntityBuilder builder = MultipartEntityBuilder
                 .create()
@@ -74,10 +77,15 @@ public class Images extends Requests {
                 .addPart("provider", new StringBody(image.getProvider(), ContentType.TEXT_PLAIN))
                 .addPart("base", new StringBody(image.getBase(), ContentType.TEXT_PLAIN))
                 .addPart("lang", new StringBody(image.getLanguage(), ContentType.TEXT_PLAIN))
-                .addPart("args", new StringBody(String.join(",", image.getArgs()), ContentType.TEXT_PLAIN))
-                .addPart("mounts", new StringBody(String.join(",", image.getMounts()), ContentType.TEXT_PLAIN))
                 .addPart("tarfile", new FileBody(new File(image.getTarFile())));
 
+        if (image.getArgs() != null) {
+            builder.addPart("args", new StringBody(String.join(",", image.getArgs()), ContentType.TEXT_PLAIN));
+        }
+
+        if (image.getMounts() != null) {
+            builder.addPart("mounts", new StringBody(String.join(",", image.getMounts()), ContentType.TEXT_PLAIN));
+        }
 
         return post(String.format(IMAGES_BASE + "/%s/create", image.getName()), builder.build(), Image.class);
     }
@@ -85,15 +93,31 @@ public class Images extends Requests {
     /**
      * Remove an image identified by its name.
      *
-     * @param name the name of an image
+     * @param name  the name of an image
      * @param force the removal of the image will be enforced
      * @throws UnikException if the request was not successful
      */
     public void delete(final String name, final boolean force) throws UnikException {
+        Asserts.notBlank(name, "Image name");
+
         Map<String, String> params = new HashMap<>();
         params.put("force", String.valueOf(force));
 
         delete(String.format(IMAGES_BASE + "/%s", name), params);
+    }
+
+    private void validateCreateImage(CreateImage image) {
+        Asserts.notNull(image, "Image");
+
+        Asserts.notBlank(image.getName(), "Image Name");
+        Asserts.notBlank(image.getProvider(), "Provider");
+        Asserts.notBlank(image.getBase(), "Base");
+        Asserts.notBlank(image.getLanguage(), "Language");
+        Asserts.notBlank(image.getTarFile(), "tar file");
+
+        if (!new File(image.getTarFile()).exists()) {
+            throw new IllegalStateException("Tar file " + image.getTarFile() + " does not exist");
+        }
     }
 
 }

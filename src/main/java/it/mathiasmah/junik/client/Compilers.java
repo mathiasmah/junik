@@ -2,6 +2,7 @@ package it.mathiasmah.junik.client;
 
 import it.mathiasmah.junik.client.exceptions.UnikException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.util.Asserts;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,13 +34,16 @@ public class Compilers extends Requests {
     /**
      * Get the description of one compiler, identified by provider, unikernel base and language
      *
-     * @param provider the name of a provider, e.g. virtualbox
-     * @param base the name of a unikernel base, e.g. osv
-     * @param language the name of a programming language, e.g. go
+     * @param provider the name of a provider, e.g. virtualbox, cannot be blank
+     * @param base     the name of a unikernel base, e.g. osv, cannot be blank
+     * @param language the name of a programming language, e.g. go, cannot be blank
      * @return A formatted {@link String} describing the compiler
      * @throws UnikException if the request is not successful
      */
     public String describe(final String provider, final String base, final String language) throws UnikException {
+        Asserts.notBlank("provider", provider);
+        Asserts.notBlank("base", base);
+        Asserts.notBlank("langauge", language);
 
         Map<String, String> params = new HashMap<>();
         params.put("provider", provider);

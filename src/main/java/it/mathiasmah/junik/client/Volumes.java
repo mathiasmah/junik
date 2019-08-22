@@ -4,7 +4,6 @@ import it.mathiasmah.junik.client.exceptions.UnikException;
 import it.mathiasmah.junik.client.models.CreateVolume;
 import it.mathiasmah.junik.client.models.Volume;
 import jdk.internal.joptsimple.internal.Strings;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -15,6 +14,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.Asserts;
 
 import java.io.File;
 import java.util.*;
@@ -45,24 +45,29 @@ public class Volumes extends Requests {
     /**
      * Describe a volume identified by its name.
      *
-     * @param name the name of a volume
+     * @param name the name of a volume, cannot be blank
      * @return a {@link Volume} describing the volume
      * @throws UnikException of the request was not successful
      * @see Volume
      */
     public Volume describe(final String name) throws UnikException {
+        Asserts.notBlank(name, "Volume name");
+
         return get(String.format(VOLUMES_BASE + "/%s", name), Volume.class);
     }
 
     /**
      * Attaches an existing volume, identified by its name, to a running instance, identified by its ID or name.
      *
-     * @param name the name of an existing volume
+     * @param name       the name of an existing volume
      * @param instanceId the name or ID of an existing volume
      * @param mountPoint the mount point of the instance where the volume should be attached
      * @throws UnikException if the request was not successful
      */
     public void attach(final String name, final String instanceId, final String mountPoint) throws UnikException {
+        Asserts.notBlank(name, "Volume name");
+        Asserts.notBlank(instanceId, "Instance Id");
+
         Map<String, String> params = new HashMap<>();
         params.put("mount", mountPoint);
 
@@ -76,6 +81,8 @@ public class Volumes extends Requests {
      * @throws UnikException if the request was not successful
      */
     public void detach(final String name) throws UnikException {
+        Asserts.notBlank(name, "Volume name");
+
         post(String.format(VOLUMES_BASE + "/%s/detach", name));
     }
 
@@ -89,8 +96,9 @@ public class Volumes extends Requests {
      * @see Volume
      */
     public Volume create(final CreateVolume createVolume) throws UnikException {
+        validateCreateVolume(createVolume);
 
-        if(Strings.isNullOrEmpty(createVolume.getTarFile())){
+        if (Strings.isNullOrEmpty(createVolume.getType())) {
             createVolume.setType(TYPE_EXT2);
         }
 
@@ -103,11 +111,13 @@ public class Volumes extends Requests {
     /**
      * Delete a volume identified by its name.
      *
-     * @param name the name of a volume
+     * @param name  the name of a volume
      * @param force the removal of the volume will be enforced
-     * @throws UnikException  if the request was not successful
+     * @throws UnikException if the request was not successful
      */
     public void delete(final String name, final boolean force) throws UnikException {
+        Asserts.notBlank(name, "Volume name");
+
         Map<String, String> params = new HashMap<>();
         params.put("force", String.valueOf(force));
 
@@ -140,5 +150,20 @@ public class Volumes extends Requests {
         HttpEntity entity = new UrlEncodedFormEntity(formparams, Consts.UTF_8);
 
         return post(String.format(VOLUMES_BASE + "/%s", createVolume.getName()), params, entity, Volume.class);
+    }
+
+    private void validateCreateVolume(CreateVolume volume) {
+        Asserts.notNull(volume, "Volume");
+
+        Asserts.notBlank(volume.getName(), "Volume name");
+        Asserts.notBlank(volume.getProvider(), "Provider");
+
+        if (volume.getTarFile() == null && volume.getSize() <= 0) {
+            throw new IllegalStateException("Either a tar file or size greater 0 must be set");
+        }
+
+        if (volume.getTarFile() != null && !new File(volume.getTarFile()).exists()) {
+            throw new IllegalStateException("Tar file " + volume.getTarFile() + " does not exist");
+        }
     }
 }

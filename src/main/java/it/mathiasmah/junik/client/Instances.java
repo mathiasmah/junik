@@ -4,6 +4,7 @@ import it.mathiasmah.junik.client.exceptions.UnikException;
 import it.mathiasmah.junik.client.models.Instance;
 import it.mathiasmah.junik.client.models.RunInstance;
 import org.apache.http.client.HttpClient;
+import org.apache.http.util.Asserts;
 
 import java.io.*;
 import java.net.*;
@@ -41,32 +42,38 @@ public class Instances extends Requests {
      * <p/>
      * Includes important information about the state of the instance.
      *
-     * @param name the name or the id of an existing instance
+     * @param name the name or the id of an existing instance, cannot be blank
      * @return a {@link Instance} holding the information about the instance
      * @throws UnikException if the request was not successful
      * @see Instance
      */
     public Instance describe(final String name) throws UnikException {
+        Asserts.notBlank(name, "Instance name");
+
         return get(String.format(INSTANCES_BASE + "/%s", name), Instance.class);
     }
 
     /**
      * Powers of an instance identified by its ID or name.
      *
-     * @param name the name or the id of an existing instance
+     * @param name the name or the id of an existing instance, cannot be blank
      * @throws UnikException if the request was not successful
      */
     public void stop(final String name) throws UnikException {
+        Asserts.notBlank(name, "Instance name");
+
         post(String.format(INSTANCES_BASE + "/%s/stop", name));
     }
 
     /**
      * Powers on an existing instance identified by its ID or name.
      *
-     * @param name the name or the id of an existing instance
+     * @param name the name or the id of an existing instance, cannot be blank
      * @throws UnikException if the request was not successful
      */
     public void start(final String name) throws UnikException {
+        Asserts.notBlank(name, "Instance name");
+
         post(String.format(INSTANCES_BASE + "/%s/start", name));
     }
 
@@ -83,6 +90,8 @@ public class Instances extends Requests {
      * @see Instance
      */
     public Instance run(final RunInstance runInstance) throws UnikException {
+        validateRunInstance(runInstance);
+
         JsonBodyBuilder builder = new JsonBodyBuilder().addObject(runInstance);
 
         try {
@@ -95,11 +104,13 @@ public class Instances extends Requests {
     /**
      * Deletes an instance identified by its ID or name.
      *
-     * @param name  the name or ID of an existing instance
+     * @param name  the name or ID of an existing instance, cannot be blank
      * @param force the removal of the instance will be enforced
      * @throws UnikException if the request was not successful
      */
     public void delete(final String name, final boolean force) throws UnikException {
+        Asserts.notBlank(name, "Instance name");
+
         Map<String, String> params = new HashMap<>();
         params.put("force", String.valueOf(force));
 
@@ -109,11 +120,13 @@ public class Instances extends Requests {
     /**
      * Retrieves logs from a running unikernel instance as a snapshot containing all logs up until the time of the request.
      *
-     * @param name the name or ID of a running instance
+     * @param name the name or ID of a running instance, cannot be blank
      * @return All logs of this instance up until the time of the request
      * @throws UnikException if the request was not successful
      */
     public String logsAsString(final String name) throws UnikException {
+        Asserts.notBlank(name, "Instance name");
+
         return get(String.format(INSTANCES_BASE + "/%s/logs", name), String.class);
     }
 
@@ -129,6 +142,8 @@ public class Instances extends Requests {
      * @see InputStream
      */
     public void logToStream(final String name, final boolean deleteOnTermination, final OutputStream outputStream) throws UnikException {
+        Asserts.notBlank(name, "Instance name");
+        Asserts.notNull(outputStream, "Output Stream");
 
         Map<String, String> params = new HashMap<>();
         params.put("follow", String.valueOf(true));
@@ -176,5 +191,12 @@ public class Instances extends Requests {
                 httpConn.disconnect();
             }
         }
+    }
+
+    private void validateRunInstance(RunInstance instance) {
+        Asserts.notNull(instance, "Instance");
+
+        Asserts.notBlank(instance.getInstanceName(), "Instance Name");
+        Asserts.notBlank(instance.getImageName(), "Image Name");
     }
 }
