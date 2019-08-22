@@ -2,6 +2,11 @@ package it.mathiasmah.junik.client.models;
 
 import java.util.List;
 
+/**
+ * A Pojo that holds the specification of a running instance
+ *
+ * @see Instance
+ */
 public class RunSpec {
     private List<DeviceMapping> deviceMappings;
     private int defaultInstanceMemory;

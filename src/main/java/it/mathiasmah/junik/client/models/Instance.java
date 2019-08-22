@@ -2,6 +2,11 @@ package it.mathiasmah.junik.client.models;
 
 import java.time.ZonedDateTime;
 
+/**
+ * A Pojo that represents a Unik instance.
+ *
+ * @see it.mathiasmah.junik.client.Instances
+ */
 public class Instance {
     private String id;
     private String name;

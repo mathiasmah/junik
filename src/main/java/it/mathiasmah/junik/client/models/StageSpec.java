@@ -1,5 +1,10 @@
 package it.mathiasmah.junik.client.models;
 
+/**
+ * A Pojo that holds the specification of an image
+ *
+ * @see Image
+ */
 public class StageSpec {
     private ImageFormat imageFormat;
     private XenVirtualizationType xenVirtualizationType;

@@ -9,10 +9,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,7 +52,7 @@ public class InstancesTest {
         runInstance.setMemoryMb(10);
         runInstance.setNoCleanUp(false);
         runInstance.setDebugMode(false);
-        runInstance.setMounts(Collections.singletonMap("/test","test-volume"));
+        runInstance.setMounts(Collections.singletonMap("/test", "test-volume"));
 
         Instance instance = client.instances().run(runInstance);
         System.out.println(instance);
@@ -64,7 +60,7 @@ public class InstancesTest {
 
     @Test
     public void delete() throws UnikException {
-        client.instances().delete("test-instance",false);
+        client.instances().delete("test-instance", false);
     }
 
     @Test
@@ -75,19 +71,6 @@ public class InstancesTest {
 
     @Test
     public void logsAsStream() throws UnikException {
-        InputStream inputStream = client.instances().logToStream("VboxUnikInstanceListener", true);
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-            String line = br.readLine();
-            while(true) {
-                if(line != null) {
-                    System.out.println(line);
-                }
-                line = br.readLine();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.instances().logToStream("VboxUnikInstanceListener", true, System.out);
     }
 }

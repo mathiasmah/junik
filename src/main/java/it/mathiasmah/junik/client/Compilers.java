@@ -31,7 +31,7 @@ public class Compilers extends Requests {
     }
 
     /**
-     * Get the description of one compiler, identified by {@param provider}, {@param base} and {@param language}
+     * Get the description of one compiler, identified by provider, unikernel base and language
      *
      * @param provider the name of a provider, e.g. virtualbox
      * @param base the name of a unikernel base, e.g. osv

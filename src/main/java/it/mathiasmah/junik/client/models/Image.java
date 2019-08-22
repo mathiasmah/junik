@@ -2,6 +2,11 @@ package it.mathiasmah.junik.client.models;
 
 import java.time.ZonedDateTime;
 
+/**
+ * A Pojo that represents a Unik image.
+ *
+ * @see it.mathiasmah.junik.client.Images
+ */
 public class Image {
     private String id;
     private String name;

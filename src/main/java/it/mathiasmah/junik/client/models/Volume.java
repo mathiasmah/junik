@@ -2,6 +2,11 @@ package it.mathiasmah.junik.client.models;
 
 import java.time.ZonedDateTime;
 
+/**
+ * A Pojo that represents a Unik volume.
+ *
+ * @see it.mathiasmah.junik.client.Volumes
+ */
 public class Volume {
     private String id;
     private String name;

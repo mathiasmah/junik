@@ -3,6 +3,11 @@ package it.mathiasmah.junik.client.models;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A Pojo that holds all the data needed to create a new {@link Image}
+ *
+ * @see it.mathiasmah.junik.client.Images
+ */
 public class CreateImage {
 
     private String name;

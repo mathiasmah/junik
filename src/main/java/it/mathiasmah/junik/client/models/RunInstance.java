@@ -3,6 +3,11 @@ package it.mathiasmah.junik.client.models;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * A Pojo that holds all the data needed to run a new {@link Instance}
+ *
+ * @see it.mathiasmah.junik.client.Instances
+ */
 public class RunInstance {
     private String instanceName;
     private String imageName;

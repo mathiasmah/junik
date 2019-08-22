@@ -1,5 +1,10 @@
 package it.mathiasmah.junik.client.models;
 
+/**
+ * A Pojo that holds all the data needed to create a new {@link Volume}
+ *
+ * @see it.mathiasmah.junik.client.Volumes
+ */
 public class CreateVolume {
     private String name;
     private String type;

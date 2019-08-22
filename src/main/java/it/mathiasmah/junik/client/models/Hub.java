@@ -1,5 +1,10 @@
 package it.mathiasmah.junik.client.models;
 
+/**
+ * A Pojo that holds all the data needed to connect to a Unik hub.
+ *
+ * @see it.mathiasmah.junik.client.Hubs
+ */
 public class Hub {
 
     private String url;

@@ -1,5 +1,8 @@
 package it.mathiasmah.junik.client.models;
 
+/**
+ * Defines a mapping between an image mount point and a volume
+ */
 public class DeviceMapping {
     private String mountPoint;
     private String deviceName;
