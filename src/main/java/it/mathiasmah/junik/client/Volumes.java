@@ -3,7 +3,6 @@ package it.mathiasmah.junik.client;
 import it.mathiasmah.junik.client.exceptions.UnikException;
 import it.mathiasmah.junik.client.models.CreateVolume;
 import it.mathiasmah.junik.client.models.Volume;
-import jdk.internal.joptsimple.internal.Strings;
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -98,7 +97,8 @@ public class Volumes extends Requests {
     public Volume create(final CreateVolume createVolume) throws UnikException {
         validateCreateVolume(createVolume);
 
-        if (Strings.isNullOrEmpty(createVolume.getType())) {
+        final String type = createVolume.getType();
+        if (type == null || createVolume.getType().isEmpty()) {
             createVolume.setType(TYPE_EXT2);
         }
 
