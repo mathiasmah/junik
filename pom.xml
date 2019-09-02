@@ -6,7 +6,7 @@
 
     <groupId>io.github.mathiasmah.unik</groupId>
     <artifactId>junik</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <name>Junik</name>
