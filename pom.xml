@@ -17,7 +17,7 @@
         <project.java.version>1.8</project.java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <org.apache.httpcomponents.version>4.5.9</org.apache.httpcomponents.version>
-        <com.fasterxml.jackson.core.version>2.9.9.3</com.fasterxml.jackson.core.version>
+        <com.fasterxml.jackson.core.version>2.9.10.1</com.fasterxml.jackson.core.version>
         <com.fasterxml.jackson.datatype.version>2.9.9</com.fasterxml.jackson.datatype.version>
         <org.junit.jupiter.version>5.5.0</org.junit.jupiter.version>
     </properties>
